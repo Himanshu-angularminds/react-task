@@ -2,16 +2,18 @@
 import React from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import Link from "next/link";
 import { signUp } from "@/services/api";
 import 'bootstrap/dist/css/bootstrap.css';
+import { useRouter } from "next/navigation";
 
 const RegisterForm = () => {
+  const router = useRouter();
+
   const initialValues = {
     name: "",
     email: "",
     password: "",
-    companyName: "",
+    company: "",
   };
 
   const validationSchema = Yup.object({
@@ -20,7 +22,7 @@ const RegisterForm = () => {
       .email("Invalid email address")
       .required("Email is required"),
     password: Yup.string().required("Password is required"),
-    companyName: Yup.string().required("Company Name is required"),
+    company: Yup.string().required("Company Name is required"),
   });
 
   const handleSubmit = (values) => {
@@ -29,7 +31,7 @@ const RegisterForm = () => {
     signUp(values)
           .then((res) => {
           alert('Success');
-          Router.push()
+          router.push('/my-profile')
           })
           .catch((err) => {
             alert('Facing issue with the registration try after some time  ');
@@ -73,7 +75,7 @@ const RegisterForm = () => {
         <div className="col-lg-6">
           <div className="card shadow-lg">
             <div className="card-body">
-              <h5 className="card-title text-center mb-4">Register</h5>
+            <h2 className="fw-bold mt-2 mb-4 text-uppercase card-title text-center">Registration</h2>
               <Formik
                 initialValues={initialValues}
                 validationSchema={validationSchema}
@@ -132,17 +134,17 @@ const RegisterForm = () => {
                   </div>
 
                   <div className="mb-3">
-                    <label htmlFor="companyName" className="form-label">
+                    <label htmlFor="company" className="form-label">
                       Company Name
                     </label>
                     <Field
                       type="text"
-                      id="companyName"
-                      name="companyName"
+                      id="company"
+                      name="company"
                       className="form-control"
                     />
                     <ErrorMessage
-                      name="companyName"
+                      name="company"
                       component="div"
                       className="text-danger"
                     />

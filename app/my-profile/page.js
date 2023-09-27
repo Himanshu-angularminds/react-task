@@ -34,7 +34,7 @@ const Profile = () => {
     email: userData?.email || "",
     role: userData?.role || "",
     isEmailVerified: userData?.isEmailVerified || "",
-    companyName: userData?.companyName || "",
+    companyName: userData?._org.name.companyName || "",
   };
   console.log(initialValues, "initialValues");
  
