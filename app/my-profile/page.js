@@ -1,7 +1,5 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { Formik, Field, Form } from "formik";
-import * as Yup from "yup";
 import AuthGuard from "@/utils/authGuard";
 import { userProfile } from "@/services/api";
 import { useRouter } from "next/navigation";
@@ -9,6 +7,13 @@ import "bootstrap/dist/css/bootstrap.css";
 
 const Profile = () => {
   const [userData, setUserData] = useState(null);
+  const [formValues, setFormValues] = useState({
+    name: "",
+    email: "",
+    role: "",
+    isEmailVerified: "",
+    companyName: "",
+  });
   let userBearer;
   const router = useRouter();
 
@@ -19,8 +24,17 @@ const Profile = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await userProfile(userBearer); 
+        const response = await userProfile(userBearer);
         setUserData(response);
+        const verified = response?.isEmailVerified === true ? "True" : "False";
+        console.log(response?._org?.name, "response?._org?.name?.companyName");
+        setFormValues({
+          name: response?.name || "",
+          email: response?.email || "",
+          role: response?.role || "",
+          isEmailVerified: verified,
+          companyName: response?._org?.name || "",
+        });
       } catch (error) {
         console.log(error);
       }
@@ -29,20 +43,26 @@ const Profile = () => {
     fetchData();
   }, []);
 
-  const initialValues = {
-    name: userData?.name || "",
-    email: userData?.email || "",
-    role: userData?.role || "",
-    isEmailVerified: userData?.isEmailVerified || "",
-    companyName: userData?._org.name.companyName || "",
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormValues({
+      ...formValues,
+      [name]: value,
+    });
   };
-  console.log(initialValues, "initialValues");
- 
 
-  // const logout = () => {
-  //   localStorage.removeItem("UserData");
-  //   router.push('/')
-  // };
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // Handle form submission here, e.g., update user data
+    // You can access formValues to get the updated data
+    console.log("Form submitted with values:", formValues);
+    alert("Update")
+  };
+
+  const logOut = (e) => {
+    router.push("/");
+    localStorage.removeItem("UserData");
+  };
 
   return (
     <>
@@ -66,67 +86,71 @@ const Profile = () => {
                 <div className="d-flex justify-content-between align-items-center mb-3">
                   <h4 className="text-right">Profile Settings</h4>
                 </div>
-                <Formik
-                  initialValues={initialValues}
-                  // validationSchema={validationSchema}
-                  // onSubmit={handleSubmit}
-                >
-                  <Form>
-                    <div className="col mt-2 mb-2">
-                      <label className="labels">Name</label>
-                      <Field
-                        type="text"
-                        name="name"
-                        className="form-control"
-                        placeholder="First Name"
-                      />
-                    </div>
-                    <div className="col-md-12 mb-2">
-                      <label className="labels">Email ID</label>
-                      <Field
-                        type="text"
-                        name="email"
-                        className="form-control"
-                        placeholder="Enter Email ID"
-                      />
-                    </div>
-                    <div className="col-md-12 mb-2">
-                      <label className="labels">Role</label>
-                      <Field
-                        type="text"
-                        name="role"
-                        className="form-control"
-                        placeholder="Role"
-                      />
-                    </div>
-                    <div className="col-md-12 mb-2">
-                      <label className="labels">Is Email Verified</label>
-                      <Field
-                        type="text"
-                        name="isEmailVerified"
-                        className="form-control"
-                        placeholder="Is Email Verified"
-                      />
-                    </div>
-                    <div className="col-md-12 mb-2">
-                      <label className="labels">Company Name</label>
-                      <Field
-                        type="text"
-                        name="companyName"
-                        className="form-control"
-                        placeholder="Company Name"
-                      />
-                    </div>
-                    <div className="mt-5 text-center">
-                      <button
-                        className="btn btn-primary profile-button"
-                        // onClick={logout()}
-                      >
-                        Logout
-                      </button>
-                    </div>
-                  </Form>
-                </Formik>
+                <form onSubmit={handleSubmit}>
+                  <div className="col mt-2 mb-2">
+                    <label className="labels">Name</label>
+                    <input
+                      type="text"
+                      name="name"
+                      value={formValues.name}
+                      className="form-control"
+                      placeholder="First Name"
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                  <div className="col-md-12 mb-2">
+                    <label className="labels">Email ID</label>
+                    <input
+                      type="text"
+                      name="email"
+                      value={formValues.email}
+                      className="form-control"
+                      placeholder="Enter Email ID"
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                  <div className="col-md-12 mb-2">
+                    <label className="labels">Role</label>
+                    <input
+                      type="text"
+                      name="role"
+                      value={formValues.role}
+                      className="form-control"
+                      placeholder="Role"
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                  <div className="col-md-12 mb-2">
+                    <label className="labels">Is Email Verified</label>
+                    <input
+                      type="text"
+                      name="isEmailVerified"
+                      value={formValues.isEmailVerified}
+                      className="form-control"
+                      placeholder="Is Email Verified"
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                  <div className="col-md-12 mb-2">
+                    <label className="labels">Company Name</label>
+                    <input
+                      type="text"
+                      name="companyName"
+                      value={formValues.companyName}
+                      className="form-control"
+                      placeholder="Company Name"
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                  <div class="d-flex justify-content-center mb-2 mt-4">
+                    <button type="button" class="btn btn-primary btn-lg">
+                      Save
+                    </button>
+                    <button type="button" class="btn btn-outline-primary ms-1 btn-lg" >
+                    Logout
+                    </button>
+                  </div>
+                </form>
               </div>
             </div>
           </div>

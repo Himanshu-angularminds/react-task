@@ -29,15 +29,15 @@ const LoginForm = () => {
   const handleSubmit = async (values) => {
     await userLogin(values)
       .then((res) => {
-        setResult({ success: true, message: 'Data retrieved successfully!' });
+        setResult({ success: true, message: "Data retrieved successfully!" });
         const { token } = res;
-        localStorage.setItem('UserData', token);
+        localStorage.setItem("UserData", token);
         if (res) {
           router.push("/my-profile");
         }
       })
       .catch((err) => {
-        setResult({ success: false, error: 'Error retrieving data!' });
+        setResult({ success: false, error: err.response.data.message });
         console.log(err, "getting error api ");
       });
   };
@@ -48,7 +48,9 @@ const LoginForm = () => {
         <div className="col-lg-6">
           <div className="card shadow-lg">
             <div className="card-body">
-            <h2 className="fw-bold mt-2 mb-4 text-uppercase card-title text-center">Login</h2>
+              <h2 className="fw-bold mt-2 mb-4 text-uppercase card-title text-center">
+                Login
+              </h2>
               <Formik
                 initialValues={initialValues}
                 validationSchema={validationSchema}
@@ -88,9 +90,13 @@ const LoginForm = () => {
                       className="text-danger"
                     />
                   </div>
-                  <p>Dont have an account? <a href="/register">Sign Up</a></p>
+                  <p>
+                    Dont have an account? <a href="/register">Sign Up</a>
+                  </p>
                   <div className="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
-                    <button type="submit" className="btn btn-primary btn-lg">Sign In</button>
+                    <button type="submit" className="btn btn-primary btn-lg">
+                      Sign In
+                    </button>
                   </div>
                 </Form>
               </Formik>
@@ -98,9 +104,16 @@ const LoginForm = () => {
           </div>
         </div>
       </div>
-      {result && (
-        <Snackbar result={result} onClose={handleCloseSnackbar} />
-      )}
+      <div
+        style={{
+          position: "absolute",
+          top: "20px",
+          right: "20px",
+          zIndex: "9999",
+        }}
+      >
+      {result && <Snackbar result={result} onClose={handleCloseSnackbar} />}
+      </div>
     </div>
   );
 };

@@ -1,14 +1,18 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { signUp } from "@/services/api";
-import 'bootstrap/dist/css/bootstrap.css';
+import "bootstrap/dist/css/bootstrap.css";
 import { useRouter } from "next/navigation";
+import Snackbar from "@/component/snackbar/page";
 
 const RegisterForm = () => {
+  const [result, setResult] = useState(null);
   const router = useRouter();
-
+  const handleCloseSnackbar = () => {
+    setResult(null);
+  };
   const initialValues = {
     name: "",
     email: "",
@@ -26,16 +30,16 @@ const RegisterForm = () => {
   });
 
   const handleSubmit = (values) => {
-    // Handle form submission and data storage here
     console.log(values);
     signUp(values)
-          .then((res) => {
-          alert('Success');
-          router.push('/my-profile')
-          })
-          .catch((err) => {
-            alert('Facing issue with the registration try after some time  ');
-          })
+      .then((res) => {
+        setResult({ success: true, message: "Registered successfully!" });
+        router.push("/my-profile");
+      })
+      .catch((err) => {
+        console.log(err.response.data.message, "eroorr");
+        setResult({ success: false, error: err.response.data.message });
+      });
   };
 
   return (
@@ -75,7 +79,9 @@ const RegisterForm = () => {
         <div className="col-lg-6">
           <div className="card shadow-lg">
             <div className="card-body">
-            <h2 className="fw-bold mt-2 mb-4 text-uppercase card-title text-center">Registration</h2>
+              <h2 className="fw-bold mt-2 mb-4 text-uppercase card-title text-center">
+                Registration
+              </h2>
               <Formik
                 initialValues={initialValues}
                 validationSchema={validationSchema}
@@ -149,15 +155,29 @@ const RegisterForm = () => {
                       className="text-danger"
                     />
                   </div>
-                  <p>Already a member? <a href="/login">Login</a></p>
+                  <p>
+                    Already a member? <a href="/login">Login</a>
+                  </p>
                   <div className="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
-                    <button type="submit" className="btn btn-primary btn-lg">Sign Up</button>
+                    <button type="submit" className="btn btn-primary btn-lg">
+                      Sign Up
+                    </button>
                   </div>
                 </Form>
               </Formik>
             </div>
           </div>
         </div>
+      </div>
+      <div
+        style={{
+          position: "absolute",
+          top: "20px",
+          right: "20px",
+          zIndex: "9999",
+        }}
+      >
+        {result && <Snackbar result={result} onClose={handleCloseSnackbar} />}
       </div>
     </div>
   );

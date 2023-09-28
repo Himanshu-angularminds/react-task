@@ -15,6 +15,14 @@ const Snackbar = ({ result, onClose }) => {
       setVariant('error');
     }
     setShowSnackbar(true);
+
+    const timer = setTimeout(() => {
+      handleClose();
+    }, 4000);
+    
+    return () => {
+      clearTimeout(timer);
+    };
   }, [result]);
 
   const handleClose = () => {
