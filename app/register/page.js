@@ -13,6 +13,7 @@ const RegisterForm = () => {
   const handleCloseSnackbar = () => {
     setResult(null);
   };
+
   const initialValues = {
     name: "",
     email: "",
@@ -34,7 +35,7 @@ const RegisterForm = () => {
     signUp(values)
       .then((res) => {
         setResult({ success: true, message: "Registered successfully!" });
-        router.push("/my-profile");
+      router.push("/my-profile");
       })
       .catch((err) => {
         console.log(err.response.data.message, "eroorr");
@@ -44,37 +45,6 @@ const RegisterForm = () => {
 
   return (
     <div className="card-body p-5 ">
-      {/* <div className="col-lg-6 mb-5">
-        <ul
-          className="nav nav-pills nav-justified mb-3"
-          id="ex1"
-          role="tablist"
-        >
-          <li className="nav-item" role="presentation">
-            <Link
-              className="nav-link"
-              href="/register"
-              role="tab"
-              aria-controls="pills-register"
-              aria-selected="true"
-            >
-              Register
-            </Link>
-          </li>
-          <li className="nav-item" role="presentation">
-            <Link
-              className="nav-link active"
-              href="auth/login"
-              role="tab"
-              aria-controls="pills-login"
-              aria-selected="false"
-            >
-              Login
-            </Link>
-          </li>
-        </ul>
-      </div> */}
-
       <div className="row justify-content-center">
         <div className="col-lg-6">
           <div className="card shadow-lg">

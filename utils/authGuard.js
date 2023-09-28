@@ -1,16 +1,25 @@
-import { useRouter } from 'next/navigation';
+"use client"
+import { useRouter, usePathname  } from 'next/navigation';
 import { useEffect } from 'react';
 
 const AuthGuard = ({ children }) => {
   const router = useRouter();
+  const pathname = usePathname();
+
+  const profilePage = "/my-profile"; 
+
+  const isAuthenticated = () => {
+    const userData = localStorage.getItem("UserData"); 
+    return !!userData;
+  };
 
   useEffect(() => {
-    const token = localStorage.getItem('UserData'); 
-    if (!token) {
-      // User is not logged in, redirect to the login page
-      router.push('/login');
+    const currentPage = pathname;
+
+    if (currentPage === profilePage && !isAuthenticated()) {
+      router.push("/login");
     }
-  }, []);
+  }, [router,pathname]);
 
   return <>{children}</>;
 };

@@ -56,18 +56,17 @@ const Profile = () => {
     // Handle form submission here, e.g., update user data
     // You can access formValues to get the updated data
     console.log("Form submitted with values:", formValues);
-    alert("Update")
+    alert("Update");
   };
 
-  const logOut = (e) => {
-    router.push("/");
+  const handleLogout = () => {
     localStorage.removeItem("UserData");
+    router.push("/login");
   };
-
   return (
     <>
       <AuthGuard>
-        <div className="container rounded bg-white mt-5 mb-5">
+        <div className="container mx-auto mt-5 p-4 rounded border shadow mb-5">
           <div className="row justify-content-center">
             <div className="col-md-4 border-right">
               <div className="d-flex flex-column align-items-center text-center p-3 py-5">
@@ -142,12 +141,16 @@ const Profile = () => {
                       onChange={handleInputChange}
                     />
                   </div>
-                  <div class="d-flex justify-content-center mb-2 mt-4">
-                    <button type="button" class="btn btn-primary btn-lg">
+                  <div className="d-flex justify-content-center mb-2 mt-4">
+                    <button type="button" className="btn btn-primary btn-lg">
                       Save
                     </button>
-                    <button type="button" class="btn btn-outline-primary ms-1 btn-lg" >
-                    Logout
+                    <button
+                      type="button"
+                      className="btn btn-outline-primary ms-1 btn-lg"
+                      onClick={handleLogout}
+                    >
+                      Logout
                     </button>
                   </div>
                 </form>

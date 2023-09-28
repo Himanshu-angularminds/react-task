@@ -12,7 +12,7 @@ const Snackbar = ({ result, onClose }) => {
       setVariant('success');
     } else {
       setMessage(result.error);
-      setVariant('error');
+      setVariant('danger');
     }
     setShowSnackbar(true);
 
