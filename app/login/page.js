@@ -4,13 +4,12 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useRouter } from "next/navigation";
 import "bootstrap/dist/css/bootstrap.css";
-import { userLogin } from "@/services/api";
 import Snackbar from "@/component/snackbar/page";
+import { signIn, useSession } from "next-auth/react";
 
 const LoginForm = () => {
   const [result, setResult] = useState(null);
   const router = useRouter();
-
   const handleCloseSnackbar = () => {
     setResult(null);
   };
@@ -27,20 +26,35 @@ const LoginForm = () => {
   });
 
   const handleSubmit = async (values) => {
-    await userLogin(values)
-      .then((res) => {
-        setResult({ success: true, message: "Data retrieved successfully!" });
-        const { token } = res;
-        localStorage.setItem("UserData", token);
-        if (res) {
-          router.push("/my-profile");
-        }
-      })
-      .catch((err) => {
-        setResult({ success: false, error: err.response.data.message });
-        console.log(err, "getting error api ");
+    // await userLogin({
+    //   email:values.email,
+    //   password:values.password
+    // })
+    //   .then((res) => {
+    //     setResult({ success: true, message: "Data retrieved successfully!" });
+    //     const { token } = res;
+    //     localStorage.setItem("UserData", token);
+    //     if (res) {
+    //       router.push("/my-profile");
+    //     }
+    //   })
+    //   .catch((err) => {
+    //     setResult({ success: false, error: err.response.data.message });
+    //     console.log(err, "getting error api ");
+    //   });
+    const username = values.email;
+    const password = values.password;
+    try {
+      await signIn("credentials", {
+        username,
+        password,
+        callbackUrl: "/my-profile", // Redirect to profile page after successful login
       });
+    } catch (error) {
+      console.error("Authentication error:", error);
+    }
   };
+  
 
   return (
     <div>
@@ -94,7 +108,9 @@ const LoginForm = () => {
                     Dont have an account? <a href="/register">Sign Up</a>
                   </p>
                   <div className="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
-                    <button type="submit" className="btn btn-primary btn-lg">
+                    <button type="submit" className="btn btn-primary btn-lg" onClick={() => {
+                      console.log("hello");
+                      signIn()}}>
                       Sign In
                     </button>
                   </div>
