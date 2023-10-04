@@ -35,7 +35,7 @@ const RegisterForm = () => {
     signUp(values)
       .then((res) => {
         setResult({ success: true, message: "Registered successfully!" });
-      router.push("/my-profile");
+      router.push("/login");
       })
       .catch((err) => {
         console.log(err.response.data.message, "eroorr");
