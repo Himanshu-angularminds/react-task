@@ -11,6 +11,11 @@ export const signUp = (data) => {
 };
 
 export const userProfile = (bearer) => {
-  let auth = { "Authorization": `Bearer ${bearer}` };
+  let auth = { Authorization: `Bearer ${bearer}` };
   return fetchApi(`${baseUrl}/auth/self`, "GET", "", auth);
+};
+
+export const userProfilePasswordUpdate = (data, bearer) => {
+  let auth = { Authorization: `Bearer ${bearer}` };
+  return fetchApi(`${baseUrl}/auth/change-password`, "POST", data, auth);
 };

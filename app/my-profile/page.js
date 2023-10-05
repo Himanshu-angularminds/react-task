@@ -67,7 +67,7 @@ const Profile = () => {
   return (
     <>
       <AuthGuard>
-        <Navbar />
+        <Navbar/>
         <div className="container mx-auto mt-5 p-4 rounded border shadow mb-5">
           <div className="row justify-content-center">
             <div className="col-md-4 border-right">
@@ -78,17 +78,17 @@ const Profile = () => {
                   width="150px"
                   alt="Profile Picture"
                 />
-                <span className="font-weight-bold">{userData?.name}</span>
-                <span className="text-black-50">{userData?.email}</span>
+                <span className="fw-bold">{userData?.name}</span>
+                <span className="fw-bold">{userData?.email}</span>
               </div>
             </div>
             <div className="col-md-6 border-right">
               <div className="p-3 py-5">
-                <div className="d-flex justify-content-between align-items-center mb-3">
-                  <h4 className="text-right">Profile Settings</h4>
+                <div className="d-flex justify-content-center align-items-center mb-3">
+                  <h4 className="text-right fw-bold">Profile Settings</h4>
                 </div>
                 <form onSubmit={handleSubmit}>
-                  <div className="col mt-2 mb-2">
+                  <div className="col mt-2 mb-2 fw-bold">
                     <label className="labels">Name</label>
                     <input
                       type="text"
@@ -99,7 +99,7 @@ const Profile = () => {
                       onChange={handleInputChange}
                     />
                   </div>
-                  <div className="col-md-12 mb-2">
+                  <div className="col-md-12 mb-2 fw-bold">
                     <label className="labels">Email ID</label>
                     <input
                       type="text"
@@ -110,7 +110,7 @@ const Profile = () => {
                       onChange={handleInputChange}
                     />
                   </div>
-                  <div className="col-md-12 mb-2">
+                  <div className="col-md-12 mb-2 fw-bold">
                     <label className="labels">Role</label>
                     <input
                       type="text"
@@ -121,7 +121,7 @@ const Profile = () => {
                       onChange={handleInputChange}
                     />
                   </div>
-                  <div className="col-md-12 mb-2">
+                  <div className="col-md-12 mb-2 fw-bold">
                     <label className="labels">Is Email Verified</label>
                     <input
                       type="text"
@@ -132,7 +132,7 @@ const Profile = () => {
                       onChange={handleInputChange}
                     />
                   </div>
-                  <div className="col-md-12 mb-2">
+                  <div className="col-md-12 mb-2 fw-bold">
                     <label className="labels">Company Name</label>
                     <input
                       type="text"
@@ -144,12 +144,12 @@ const Profile = () => {
                     />
                   </div>
                   <div className="d-flex justify-content-center mb-2 mt-4">
-                    <button type="button" className="btn btn-primary btn-lg">
+                    <button type="button" className="btn btn-danger btn-lg ">
                       Save
                     </button>
                     <button
                       type="button"
-                      className="btn btn-outline-primary ms-1 btn-lg"
+                      className="btn btn-outline-danger ms-1 btn-lg fw-bold"
                       onClick={handleLogout}
                     >
                       Logout

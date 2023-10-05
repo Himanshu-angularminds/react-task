@@ -1,10 +1,13 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "bootstrap/dist/css/bootstrap.min.css";
+import ModelForget from "../Model/ModelForget";
 
 const Navbar = ({ currentUser }) => {
+  const [showModal, setShowModal] = useState(false);
   return (
+    <>
     <nav className="navbar navbar-expand-lg navbar-dark p-1 bg-danger" id="headerNav">
       <div className="container-fluid">
         <ul className="navbar-nav">
@@ -53,7 +56,7 @@ const Navbar = ({ currentUser }) => {
               </a>
               <ul className="dropdown-menu dropdown-menu-dark dropdown-menu-end">
                 <li>
-                  <a className="dropdown-item" href="#">
+                  <a className="dropdown-item" href="#" onClick={() => setShowModal(true)}>
                     Change Password
                   </a>
                 </li>
@@ -73,6 +76,8 @@ const Navbar = ({ currentUser }) => {
         </div>
       </div>
     </nav>
+    <ModelForget showModal={showModal} closeModal={() => setShowModal(false)} onSubmit={handlePasswordChange} />
+    </>
   );
 };
 
