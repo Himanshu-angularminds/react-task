@@ -4,6 +4,7 @@ import AuthGuard from "@/utils/authGuard";
 import { userProfile } from "@/services/api";
 import { useRouter } from "next/navigation";
 import "bootstrap/dist/css/bootstrap.css";
+import Navbar from "../components/Navbar/Navbar";
 
 const Profile = () => {
   const [userData, setUserData] = useState(null);
@@ -41,7 +42,7 @@ const Profile = () => {
     };
 
     fetchData();
-  }, []);
+  }, [userBearer]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -66,6 +67,7 @@ const Profile = () => {
   return (
     <>
       <AuthGuard>
+        <Navbar />
         <div className="container mx-auto mt-5 p-4 rounded border shadow mb-5">
           <div className="row justify-content-center">
             <div className="col-md-4 border-right">

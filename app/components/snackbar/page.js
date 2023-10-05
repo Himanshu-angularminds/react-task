@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+"use client"
+import React, { useEffect, useState } from 'react';
 import { Toast } from 'react-bootstrap';
 
 const Snackbar = ({ result, onClose }) => {

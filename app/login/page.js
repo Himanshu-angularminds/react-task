@@ -5,7 +5,7 @@ import * as Yup from "yup";
 import { useRouter } from "next/navigation";
 import "bootstrap/dist/css/bootstrap.css";
 import { userLogin } from "@/services/api";
-import Snackbar from "@/component/snackbar/page";
+import Snackbar from "../components/snackbar/page";
 
 const LoginForm = () => {
   const [result, setResult] = useState(null);
