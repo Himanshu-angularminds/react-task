@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, {useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useRouter } from "next/navigation";
@@ -10,7 +10,7 @@ import Snackbar from "../components/snackbar/page";
 const LoginForm = () => {
   const [result, setResult] = useState(null);
   const router = useRouter();
-
+  const siteKey = process?.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
   const handleCloseSnackbar = () => {
     setResult(null);
   };
@@ -27,7 +27,15 @@ const LoginForm = () => {
   });
 
   const handleSubmit = async (values) => {
-    await userLogin(values)
+    let captcha = await reCAPTCHA();
+    console.log(captcha,"captchacaptcha");
+    const { email, password } = values;
+    const formData = {
+      email,
+      password,
+      captcha,
+    };
+    await userLogin(formData)
       .then((res) => {
         setResult({ success: true, message: "Data retrieved successfully!" });
         const { token } = res;
@@ -40,6 +48,23 @@ const LoginForm = () => {
         setResult({ success: false, error: err.response.data.message });
         console.log(err, "getting error api ");
       });
+  };
+
+  const reCAPTCHA = () => {
+    const { grecaptcha } = window;
+    return new Promise((resolve, reject) => {
+      grecaptcha.ready(function () {
+        grecaptcha
+          .execute(siteKey, { action: "submit" })
+          .then(function (token) {
+            resolve(token);
+          })
+          .catch(function (err) {
+            console.error(err);
+            reject(err);
+          });
+      });
+    });
   };
 
   return (
@@ -112,7 +137,7 @@ const LoginForm = () => {
           zIndex: "9999",
         }}
       >
-      {result && <Snackbar result={result} onClose={handleCloseSnackbar} />}
+        {result && <Snackbar result={result} onClose={handleCloseSnackbar} />}
       </div>
     </div>
   );

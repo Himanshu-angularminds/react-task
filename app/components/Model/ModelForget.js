@@ -12,23 +12,27 @@ const ModelForget = ({ showModal, closeModal, onSubmit }) => {
   const formik = useFormik({
     initialValues: {
       old_password: "",
-      new_Password: "",
+      new_password: "",
     },
     validationSchema: Yup.object({
       old_password: Yup.string().required("Old Password is required"),
-      new_Password: Yup.string().required("New Password is required"),
+      new_password: Yup.string().required("New Password is required"),
     }),
     onSubmit: async (values, { resetForm }) => {
-      console.log(values,"values for forget");
+      // await fetch("/api/index.js").then((res)=>{
+      //   console.log("ress ::", res.status);
+      // }).catch((err)=>{
+      //   console.log("err::", err);
+      // });
       await userProfilePasswordUpdate(values,userBearer)
         .then((res) => {
-          setResult({ success: true, message: "Data retrieved successfully!" });
-          closeModal(); // Close the modal after form submission
-          resetForm();
+            closeModal();
+            resetForm();
+          setResult({ success: true, message: "Data Update successfully!" });
         })
         .catch((err) => {
           setResult({ success: false, error: err.response.data.message });
-          console.log(err, "getting error api ");
+          console.log(err, "Password Update API Error ");
         });
       // Perform validation or other actions if needed
       // onSubmit(values);
@@ -69,17 +73,17 @@ const ModelForget = ({ showModal, closeModal, onSubmit }) => {
                 ) : null}
               </div>
               <div className="mb-3">
-                <label htmlFor="new_Password" className="form-label">
+                <label htmlFor="new_password" className="form-label">
                   New Password
                 </label>
                 <input
                   type="password"
                   className="form-control"
-                  id="new_Password"
-                  {...formik.getFieldProps("new_Password")}
+                  id="new_password"
+                  {...formik.getFieldProps("new_password")}
                 />
-                {formik.touched.new_Password && formik.errors.new_Password ? (
-                  <div className="text-danger">{formik.errors.new_Password}</div>
+                {formik.touched.new_password && formik.errors.new_password ? (
+                  <div className="text-danger">{formik.errors.new_password}</div>
                 ) : null}
               </div>
               <button type="submit" className="btn btn-danger">

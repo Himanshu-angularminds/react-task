@@ -76,7 +76,7 @@ const Navbar = ({ currentUser }) => {
         </div>
       </div>
     </nav>
-    <ModelForget showModal={showModal} closeModal={() => setShowModal(false)} onSubmit={handlePasswordChange} />
+    <ModelForget showModal={showModal} closeModal={() => setShowModal(false)} />
     </>
   );
 };
