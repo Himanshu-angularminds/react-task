@@ -1,8 +1,9 @@
 "use client";
+
 import React, { useState } from "react";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "bootstrap/dist/css/bootstrap.min.css";
-import ModelForget from "../Model/ModelForget";
+import ModelChangePassword from "../Model/ModelChangePassword";
 
 const Navbar = ({ currentUser }) => {
   const [showModal, setShowModal] = useState(false);
@@ -76,7 +77,7 @@ const Navbar = ({ currentUser }) => {
         </div>
       </div>
     </nav>
-    <ModelForget showModal={showModal} closeModal={() => setShowModal(false)} />
+    <ModelChangePassword showModal={showModal} closeModal={() => setShowModal(false)} />
     </>
   );
 };

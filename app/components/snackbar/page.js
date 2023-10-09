@@ -1,6 +1,8 @@
 "use client"
+
 import React, { useEffect, useState } from 'react';
 import { Toast } from 'react-bootstrap';
+import "bootstrap/dist/css/bootstrap.css";
 
 const Snackbar = ({ result, onClose }) => {
   const [showSnackbar, setShowSnackbar] = useState(false);

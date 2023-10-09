@@ -1,99 +1,113 @@
-import React from "react";
+'use client';
+
+import React, { useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { userProfilePasswordUpdate } from "@/services/api";
+import { userForget } from "@/services/api";
+import Snackbar from "../snackbar/page";
+import "bootstrap/dist/css/bootstrap.css";
+
+const siteKey = process?.env?.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
 
 const ModelForget = ({ showModal, closeModal, onSubmit }) => {
-  let userBearer;
+  const [result, setResult] = useState(null);
 
-  if (typeof window !== "undefined") {
-    userBearer = localStorage.getItem("UserData");
-  }
-  const formik = useFormik({
+  const handleCloseSnackbar = () => {
+    setResult(null);
+  };
+
+  const { getFieldProps, handleSubmit, resetForm, touched, errors } = useFormik({
     initialValues: {
-      old_password: "",
-      new_password: "",
+      email: "",
     },
     validationSchema: Yup.object({
-      old_password: Yup.string().required("Old Password is required"),
-      new_password: Yup.string().required("New Password is required"),
+      email: Yup.string().required("Email is required"),
     }),
-    onSubmit: async (values, { resetForm }) => {
-      // await fetch("/api/index.js").then((res)=>{
-      //   console.log("ress ::", res.status);
-      // }).catch((err)=>{
-      //   console.log("err::", err);
-      // });
-      await userProfilePasswordUpdate(values,userBearer)
-        .then((res) => {
-            closeModal();
-            resetForm();
-          setResult({ success: true, message: "Data Update successfully!" });
-        })
-        .catch((err) => {
-          setResult({ success: false, error: err.response.data.message });
-          console.log(err, "Password Update API Error ");
-        });
-      // Perform validation or other actions if needed
-      // onSubmit(values);
-      // Reset form values
+    onSubmit: async (values) => {
+      try {
+        const captcha = await reCAPTCHA();
+        const { email } = values;
+        const formData = {
+          email,
+          captcha,
+        };
+        await userForget(formData);
+        closeModal();
+        setResult({ success: true, message: "Please Check the mail" });
+        resetForm();
+      } catch (err) {
+        console.log(err.response.data.message, "error");
+        setResult({ success: false, error: err.response.data.message });
+        console.log(err, "getting error api");
+      }
     },
   });
 
+  const reCAPTCHA = () => {
+    const { grecaptcha } = window;
+    return new Promise((resolve, reject) => {
+      grecaptcha.ready(function () {
+        grecaptcha
+          .execute(siteKey, { action: "submit" })
+          .then(function (token) {
+            resolve(token);
+          })
+          .catch(function (err) {
+            console.error(err);
+            reject(err);
+          });
+      });
+    });
+  };
+
   return (
-    <div
-      className={`modal fade ${showModal ? "show" : ""} mt-5`}
-      tabIndex="-1"
-      style={{ display: showModal ? "block" : "none" }}
-    >
-      <div className="modal-dialog">
-        <div className="modal-content">
-          <div className="modal-header">
-            <h5 className="modal-title">Change Password</h5>
-            <button
-              type="button"
-              className="btn-close"
-              onClick={closeModal}
-            ></button>
-          </div>
-          <div className="modal-body">
-            <form onSubmit={formik.handleSubmit}>
-              <div className="mb-3">
-                <label htmlFor="old_password" className="form-label">
-                  Old Password
-                </label>
-                <input
-                  type="password"
-                  className="form-control"
-                  id="old_password"
-                  {...formik.getFieldProps("old_password")}
-                />
-                {formik.touched.old_password && formik.errors.old_password ? (
-                  <div className="text-danger">{formik.errors.old_password}</div>
-                ) : null}
-              </div>
-              <div className="mb-3">
-                <label htmlFor="new_password" className="form-label">
-                  New Password
-                </label>
-                <input
-                  type="password"
-                  className="form-control"
-                  id="new_password"
-                  {...formik.getFieldProps("new_password")}
-                />
-                {formik.touched.new_password && formik.errors.new_password ? (
-                  <div className="text-danger">{formik.errors.new_password}</div>
-                ) : null}
-              </div>
-              <button type="submit" className="btn btn-danger">
-                Change Password
-              </button>
-            </form>
+    <>
+      <div
+        className={`modal fade ${showModal ? "show" : ""} mt-5`}
+        tabIndex="-1"
+        style={{ display: showModal ? "block" : "none" }}
+      >
+        <div className="modal-dialog">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title">Forget Password</h5>
+              <button type="button" className="btn-close" onClick={closeModal}></button>
+            </div>
+            <div className="modal-body">
+              <form onSubmit={handleSubmit}>
+                <div className="mb-3">
+                  <label htmlFor="Email" className="form-label">
+                    Email
+                  </label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="email"
+                    {...getFieldProps("email")}
+                  />
+                  {touched.email && errors.email && (
+                    <div className="text-danger">{errors.email}</div>
+                  )}
+                </div>
+                <button type="submit" className="btn btn-danger">
+                  Submit
+                </button>
+              </form>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+      <div
+        style={{
+          position: "absolute",
+          top: "20px",
+          right: "20px",
+          zIndex: "9999",
+        }}
+      >
+        {result && <Snackbar result={result} onClose={handleCloseSnackbar} />}
+      </div>
+    </>
   );
 };
 

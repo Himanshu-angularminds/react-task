@@ -1,16 +1,19 @@
 "use client";
-import React, {useState } from "react";
+import React, { useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useRouter } from "next/navigation";
 import "bootstrap/dist/css/bootstrap.css";
 import { userLogin } from "@/services/api";
 import Snackbar from "../components/snackbar/page";
+import ModelForget from "../components/Model/ModelForget";
 
 const LoginForm = () => {
   const [result, setResult] = useState(null);
   const router = useRouter();
   const siteKey = process?.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
+  const [showModal, setShowModal] = useState(false);
+
   const handleCloseSnackbar = () => {
     setResult(null);
   };
@@ -28,7 +31,6 @@ const LoginForm = () => {
 
   const handleSubmit = async (values) => {
     let captcha = await reCAPTCHA();
-    console.log(captcha,"captchacaptcha");
     const { email, password } = values;
     const formData = {
       email,
@@ -37,7 +39,7 @@ const LoginForm = () => {
     };
     await userLogin(formData)
       .then((res) => {
-        setResult({ success: true, message: "Data retrieved successfully!" });
+        setResult({ success: true, message: "Login Successfully!" });
         const { token } = res;
         localStorage.setItem("UserData", token);
         if (res) {
@@ -114,12 +116,19 @@ const LoginForm = () => {
                       component="div"
                       className="text-danger"
                     />
+                    <div className="row mb-4 mt-5">
+                      <div className="col d-flex justify-content-center">
+                        <p>
+                          Dont have an account? <a href="/register">Sign Up</a>
+                        </p>
+                      </div>
+                      <div className="col">
+                        <a href="#!" onClick={() => setShowModal(true)}>Forgot password?</a>
+                      </div>
+                    </div>
                   </div>
-                  <p>
-                    Dont have an account? <a href="/register">Sign Up</a>
-                  </p>
                   <div className="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
-                    <button type="submit" className="btn btn-primary btn-lg">
+                    <button type="submit" className="btn btn-danger btn-lg">
                       Sign In
                     </button>
                   </div>
@@ -129,6 +138,7 @@ const LoginForm = () => {
           </div>
         </div>
       </div>
+      <ModelForget showModal={showModal} closeModal={() => setShowModal(false)} />
       <div
         style={{
           position: "absolute",
