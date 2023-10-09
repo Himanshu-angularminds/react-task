@@ -20,6 +20,10 @@ export const userForget = async (data) => {
   return await fetchApi(`${baseUrl}/auth/forgot-password`, "POST", data);
 };
 
+export const userRestPassword = async (token,data) => {
+  return await fetchApi(`${baseUrl}/auth/reset-password?token=${token}`, "POST", data);
+};
+
 export const userProfilePasswordUpdate = async (data, bearer) => {
   let auth = { Authorization: `Bearer ${bearer}` };
   return await fetchApi(
