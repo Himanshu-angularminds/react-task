@@ -1,5 +1,5 @@
 import fetchApi from "../utils/fetchApi";
-
+// All apis are of Admin 
 const baseUrl = "https://shop-api.ngminds.com";
 
 export const userLogin = (data) => {
@@ -19,6 +19,16 @@ export const userProfile = (bearer) => {
 export const userProfileUpdate = (data,bearer) => {
   let auth = { Authorization: `Bearer ${bearer}` };
   return fetchApi(`${baseUrl}/users/org`, "PATCH", data, auth);
+};
+
+export const userProfileVerify = (bearer) => {
+  let auth = { Authorization: `Bearer ${bearer}` };
+  return fetchApi(`${baseUrl}/auth/send-verification-email`, "POST", "", auth);
+};
+
+export const verifyUserEmail = (token) => {
+  console.log(token,"im verified api call");
+  return fetchApi(`${baseUrl}/auth/verify-email?token=${token}`, "POST");
 };
 
 export const userForget = async (data) => {
