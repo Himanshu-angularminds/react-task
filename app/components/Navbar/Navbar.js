@@ -4,9 +4,15 @@ import React, { useState } from "react";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "bootstrap/dist/css/bootstrap.min.css";
 import ModelChangePassword from "../Model/ModelChangePassword";
+import { useRouter } from "next/navigation";
 
 const Navbar = ({ currentUser }) => {
   const [showModal, setShowModal] = useState(false);
+  const router = useRouter();
+  const handleLogout = () => {
+    localStorage.removeItem("UserData");
+    router.push("/login");
+  };
   return (
     <>
     <nav className="navbar navbar-expand-lg navbar-dark p-1 bg-danger" id="headerNav">
@@ -37,7 +43,7 @@ const Navbar = ({ currentUser }) => {
             </a>
           </li>
           <li className="nav-item">
-            <a className="nav-link mx-2" href="#">
+            <a className="nav-link mx-2" href="/users">
               User
             </a>
           </li>
@@ -69,6 +75,11 @@ const Navbar = ({ currentUser }) => {
                 <li>
                   <a className="dropdown-item" href="#">
                     Reset Password
+                  </a>
+                </li>
+                <li>
+                  <a className="dropdown-item" href="#" onClick={() => handleLogout()}>
+                    Logout
                   </a>
                 </li>
               </ul>

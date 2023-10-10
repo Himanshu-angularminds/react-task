@@ -16,6 +16,11 @@ export const userProfile = (bearer) => {
   return fetchApi(`${baseUrl}/auth/self`, "GET", "", auth);
 };
 
+export const userProfileUpdate = (data,bearer) => {
+  let auth = { Authorization: `Bearer ${bearer}` };
+  return fetchApi(`${baseUrl}/users/org`, "PATCH", data, auth);
+};
+
 export const userForget = async (data) => {
   return await fetchApi(`${baseUrl}/auth/forgot-password`, "POST", data);
 };
