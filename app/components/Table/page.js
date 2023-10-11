@@ -54,7 +54,6 @@ const UserDataTable = () => {
     }
   };
 
-  // Columns definition for DataTable
   const columns = [
     {
       name: "Sr. No",
@@ -97,7 +96,6 @@ const UserDataTable = () => {
         </>
       ),
     },
-    // Add more columns as needed
   ];
 
   const handlePageChange = (page) => {
@@ -132,7 +130,6 @@ const UserDataTable = () => {
       });
     }
   };
-  // Custom styles for DataTable rows
   const customStyles = {
     rows: {
       style: {

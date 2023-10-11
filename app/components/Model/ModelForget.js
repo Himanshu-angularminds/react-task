@@ -34,29 +34,6 @@ const ModelForget = ({ showModal, closeModal, token }) => {
         password: "",
       },
       // validationSchema,
-      // onSubmit: async (values) => {
-      //   try {
-      //     const captcha = await reCAPTCHA();
-      //     const { email, password } = values;
-      //     let formData = {
-      //       email,
-      //       captcha,
-      //     };
-
-      //     if (isResetPassword) {
-      //       formData.password = password;
-      //       await userRestPassword(token, formData);
-      //     } else {
-      //       await userForget(formData);
-      //     }
-      //     closeModal();
-      //     setResult({ success: true, message: "Please Check the mail" });
-      //     resetForm();
-      //   } catch (err) {
-      //     console.error(err);
-      //     setResult({ success: false, error: err.response.data.message });
-      //   }
-      // },
       onSubmit: async (values) => {
         try {
           const { email, password } = values;

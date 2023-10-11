@@ -41,9 +41,6 @@ const ModelChangePassword = ({ showModal, closeModal, onSubmit }) => {
           setResult({ success: false, error: err.response.data.message });
           console.log(err, "Password Update API Error ");
         });
-      // Perform validation or other actions if needed
-      // onSubmit(values);
-      // Reset form values
     },
   });
 
