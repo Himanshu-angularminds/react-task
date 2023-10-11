@@ -3,30 +3,36 @@
 import React, { useState, useEffect } from "react";
 import DataTable from "react-data-table-component";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { GetUser } from "@/services/usersApi";
+import { DeleteUser, GetUser } from "@/services/usersApi";
 import { BsPencil, BsTrash } from "react-icons/bs";
 import UserAdd from "../Model/UserAddModel";
+import DeleteConfirmationModal from "../Model/DeleteUserModel";
+import Snackbar from "../snackbar/page";
 
 const UserDataTable = () => {
   const [userData, setUserData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [refreshApi, setRefreshApi] = useState(false);
+  const [deletemodel, setDeleteModel] = useState(false);
+  const [result, setResult] = useState(null);
+  const [selectedUserId, setSelectedUserId] = useState(null);
   const [searchText, setSearchText] = useState("");
   const [pagination, setPagination] = useState({
     totalRows: 0,
     perPage: 10,
     page: 1,
   });
+  const handleCloseSnackbar = () => {
+    setResult(null);
+  };
   //   const [sort, setSort] = useState({ field: "id", direction: "asc" });
   const [sort, setSort] = useState({});
-  let userBearer;
-  if (typeof window !== "undefined") {
-    userBearer = localStorage.getItem("UserData");
-  }
+  const userBearer = localStorage.getItem("UserData");
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [refreshApi]);
 
   const fetchData = async () => {
     try {
@@ -47,32 +53,6 @@ const UserDataTable = () => {
       setLoading(false);
     }
   };
-  //   useEffect(() => {
-  //     const fetchData = async () => {
-  //       try {
-  //         // Fetch data from API with pagination, sorting, and limit parameters
-  //         const response = await GetUser({
-  //           userBearer,
-  //           page: pagination.page,
-  //           limit: pagination.perPage,
-  //           sort: `${sort.field},${sort.direction}`,
-  //         });
-
-  //         // Set user data and total rows for pagination
-  //         setUserData(response.results);
-  //         setPagination((prev) => ({
-  //           ...prev,
-  //           totalRows: response.totalResults,
-  //         }));
-  //         setLoading(false);
-  //       } catch (error) {
-  //         console.log(error);
-  //         setLoading(false);
-  //       }
-  //     };
-
-  //     fetchData();
-  //   }, []);
 
   // Columns definition for DataTable
   const columns = [
@@ -83,17 +63,17 @@ const UserDataTable = () => {
     },
     {
       name: "Name",
-      selector: "name",
+      selector: (row) => row.name,
       sortable: true,
     },
     {
       name: "Email",
-      selector: "email",
+      selector: (row) => row.email,
       sortable: true,
     },
     {
       name: "Role",
-      selector: "role",
+      selector: (row) => row.role,
       sortable: true,
     },
     {
@@ -101,12 +81,15 @@ const UserDataTable = () => {
       cell: (row) => (
         <>
           <div className="d-flex">
-            <button className="btn btn-link" onClick={() => handleEdit(row.id)}>
+            <button
+              className="btn btn-link"
+              onClick={() => handleEdit(row._id)}
+            >
               <BsPencil size={20} style={{ color: "red" }} />
             </button>
             <button
               className="btn btn-link"
-              onClick={() => handleDelete(row.id)}
+              onClick={() => handleDelete(row._id)}
             >
               <BsTrash size={20} style={{ color: "red" }} />
             </button>
@@ -126,19 +109,28 @@ const UserDataTable = () => {
   };
 
   const handleEdit = (userId) => {
-    alert("edit", userId);
-    console.log("Edit User: ", userId);
+    setSelectedUserId(userId);
+    setShowModal(true);
   };
 
   const handleDelete = async (userId) => {
-    // try {
-    //   await DeleteUser(userId);
-    //   // Logic to update UI after successful deletion (e.g., refetch data)
-    //   fetchData();
-    // } catch (error) {
-    //   console.error(error);
-    // }
-    alert("delete", userId);
+    setSelectedUserId(userId);
+    setDeleteModel(true);
+  };
+
+  const confirmDelete = async (userId) => {
+    try {
+      await DeleteUser(userId, userBearer);
+      setResult({ success: true, message: "Password Changed Successfully!" });
+      setDeleteModel(false);
+      setRefreshApi(true);
+    } catch (error) {
+      console.error(error);
+      setResult({
+        success: false,
+        error: error.response?.data?.message || "An error occurred",
+      });
+    }
   };
   // Custom styles for DataTable rows
   const customStyles = {
@@ -149,14 +141,14 @@ const UserDataTable = () => {
     },
     headCells: {
       style: {
-        paddingLeft: "8px", 
+        paddingLeft: "8px",
         paddingRight: "8px",
-        fontWeight: "bold", 
+        fontWeight: "bold",
       },
     },
     cells: {
       style: {
-        paddingLeft: "5px", 
+        paddingLeft: "5px",
         paddingRight: "5px",
       },
     },
@@ -201,7 +193,7 @@ const UserDataTable = () => {
             setPagination((prev) => ({ ...prev, perPage, page: 1 }))
           }
           onChangePage={handlePageChange}
-          onSort={handleSort}
+          sortactive={handleSort}
           sortServer
           progressPending={loading}
           striped
@@ -210,7 +202,28 @@ const UserDataTable = () => {
           responsive
         />
       </div>
-      <UserAdd show={showModal} handleClose={() => setShowModal(false)} />
+      <UserAdd
+        setRefreshApi={setRefreshApi}
+        userId={selectedUserId}
+        show={showModal}
+        handleClose={() => setShowModal(false)}
+      />
+      <DeleteConfirmationModal
+        show={deletemodel}
+        handleClose={() => setDeleteModel(false)}
+        handleConfirmDelete={confirmDelete}
+        userId={selectedUserId}
+      />
+      <div
+        style={{
+          position: "absolute",
+          top: "20px",
+          right: "20px",
+          zIndex: "9999",
+        }}
+      >
+        {result && <Snackbar result={result} onClose={handleCloseSnackbar} />}
+      </div>
     </>
   );
 };

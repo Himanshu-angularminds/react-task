@@ -10,7 +10,6 @@ import ModelEmailVerify from "../Model/ModelEmailVerify";
 const Navbar = ({ currentUser }) => {
   const [showModal, setShowModal] = useState(false);
   const [showModalverify, setShowModalVerify] = useState(false);
-  console.log(showModalverify, "3333");
   const router = useRouter();
   const handleLogout = () => {
     localStorage.removeItem("UserData");
@@ -64,7 +63,7 @@ const Navbar = ({ currentUser }) => {
             id="navbarNavDarkDropdown"
           >
             <ul className="navbar-nav justify-content-end">
-              <li className="nav-item dropdown">
+              <li className="dropdown">
                 <a
                   className="nav-link dropdown-toggle"
                   href="#"
@@ -72,7 +71,7 @@ const Navbar = ({ currentUser }) => {
                   data-bs-toggle="dropdown"
                   aria-expanded="false"
                 >
-                  {currentUser ? currentUser.name : "Account"}
+                Account
                 </a>
                 <ul className="dropdown-menu dropdown-menu-dark dropdown-menu-end">
                   <li>

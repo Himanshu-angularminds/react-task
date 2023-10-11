@@ -1,56 +1,125 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import Snackbar from "../snackbar/page";
-import { CreateUser } from "@/services/usersApi";
+import {
+  CreateUser,
+  GetUserDetail,
+  UpdateUserDetail,
+  UpdateUserRole,
+} from "@/services/usersApi";
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-const UserAdd = ({ show, handleClose, handleSubmit }) => {
+const UserAdd = ({ show, handleClose, userId, setRefreshApi }) => {
   const [result, setResult] = useState(null);
+  const userBearer = localStorage.getItem("UserData");
+  const isEditMode = userId !== null;
   const handleCloseSnackbar = () => {
     setResult(null);
   };
-  let userBearer;
-  if (typeof window !== "undefined") {
-    userBearer = localStorage.getItem("UserData");
-  }
   const formik = useFormik({
     initialValues: {
       name: "",
       email: "",
       password: "",
-      role: "",
+      role: "user",
     },
     validationSchema: Yup.object({
       name: Yup.string().required("Name Required"),
       email: Yup.string()
         .email("Invalid email address")
         .required("Email Required"),
-      password: Yup.string().required("Password Required"),
+      password: isEditMode
+        ? Yup.string()
+        : Yup.string().required("Password Required"),
       role: Yup.string().required("Role Required"),
     }),
     onSubmit: async (values, { resetForm }) => {
-    //   console.log(values, "values");
-      console.log(values, userBearer,":::inSubmit");
-      await CreateUser(values, userBearer)
-        .then((res) => {
-          console.log(res, "from the user add");
+      try {
+        if (isEditMode) {
+          const { email, name } = values;
+          const updateData = {
+            email,
+            name,
+          };
+      
+          await UpdateUserDetail(userId, updateData, userBearer);
+          setRefreshApi(true);
           handleClose();
+          resetForm();
           setResult({
             success: true,
-            message: "User Added Successfully!",
+            message: "User Updated Successfully!",
           });
+        } else {
+          await CreateUser(values, userBearer);
+          setRefreshApi(true);
+          handleClose();
           resetForm();
-        })
-        .catch((err) => {
-          setResult({ success: false, error: err.response.data.message });
-          console.log(err, "User Create API Error ");
+          setResult({
+            success: true,
+            message: "User Created Successfully!",
+          });
+        }
+      } catch (error) {
+        console.error("User API Error: ", error);
+      
+        let errorMessage = "An error occurred";
+        if (error.response && error.response.data && error.response.data.message) {
+          errorMessage = error.response.data.message;
+        }
+      
+        setResult({
+          success: false,
+          error: errorMessage,
         });
+      }
+      
     },
   });
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await GetUserDetail(userId, userBearer);
+        formik.setValues({
+          name: response?.name || "",
+          email: response?.email || "",
+          role: response?.role || "",
+        });
+      } catch (error) {
+        console.error("Get User Detail API Error: ", error);
+      }
+    };
+  
+    if (isEditMode) {
+      fetchData();
+    }
+  }, [isEditMode, userBearer, userId]);
+  
+
+  const handleRoleUpdate = async (userId, updatedRole) => {
+
+    const role = { role: updatedRole };
+    try {
+      UpdateUserRole(userId, role, userBearer);
+      setRefreshApi(true);
+      handleClose();
+      resetForm();
+      setResult({
+        success: true,
+        message: "Role Updated Successfully!",
+      });
+    } catch (error) {
+      setResult({
+        success: false,
+        error: error.response?.data?.message || "An error occurred",
+      });
+    }
+  };
 
   return (
     <>
@@ -62,7 +131,9 @@ const UserAdd = ({ show, handleClose, handleSubmit }) => {
         <div className="modal-dialog">
           <div className="modal-content">
             <div className="modal-header">
-              <h5 className="modal-title">Add User</h5>
+              <h5 className="modal-title">
+                {!isEditMode ? "Add User" : "Update User"}
+              </h5>
               <button
                 type="button"
                 className="btn-close"
@@ -99,27 +170,14 @@ const UserAdd = ({ show, handleClose, handleSubmit }) => {
                     ) : null}
                   </div>
                 </div>
-                <div className="mt-3 mb-3">
-                  <label htmlFor="password" className="form-label">
-                    Password*
-                  </label>
-                  <input
-                    type="password"
-                    className="form-control"
-                    id="password"
-                    {...formik.getFieldProps("password")}
-                  />
-                  {formik.touched.password && formik.errors.password ? (
-                    <div className="text-danger">{formik.errors.password}</div>
-                  ) : null}
-                </div>
-                <div className="row mt-2">
-                  {/* <div className="col-md-6">
-                    <label className="form-label">Password</label>
+                {!isEditMode && (
+                  <div className="mt-3 mb-3">
+                    <label htmlFor="password" className="form-label">
+                      Password*
+                    </label>
                     <input
                       type="password"
                       className="form-control"
-                      placeholder="Password"
                       id="password"
                       {...formik.getFieldProps("password")}
                     />
@@ -128,22 +186,30 @@ const UserAdd = ({ show, handleClose, handleSubmit }) => {
                         {formik.errors.password}
                       </div>
                     ) : null}
-                  </div> */}
+                  </div>
+                )}
+                <div className="row mt-2">
                   <div className="col-md-6">
-                    <label className="form-label">Role*</label>
-                    <input
-                      type="text"
-                      className="form-control"
+                    <label className="form-label">Role</label>
+                    <select
+                      className="form-select"
                       id="role"
-                      placeholder="Role"
                       {...formik.getFieldProps("role")}
-                    />
+                    >
+                      <option value="user">User</option>
+                      <option value="admin">Admin</option>
+                    </select>
                     {formik.touched.role && formik.errors.role ? (
                       <div className="text-danger">{formik.errors.role}</div>
                     ) : null}
                   </div>
                   <div className="col-md-5">
-                    <button className="btn btn-danger mt-4 d-flex form-label ">
+                    <button
+                      className="btn btn-danger mt-4 d-flex form-label"
+                      onClick={() => {
+                        handleRoleUpdate(userId, formik.values.role);
+                      }}
+                    >
                       Role Update
                     </button>
                   </div>
@@ -153,7 +219,7 @@ const UserAdd = ({ show, handleClose, handleSubmit }) => {
                   type="submit"
                   className="btn btn-danger mt-3 d-flex justify-content-center"
                 >
-                  Create User
+                  {!isEditMode ? "Create User" : "Update User"}
                 </button>
               </form>
             </div>

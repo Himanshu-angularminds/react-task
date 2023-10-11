@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from "react";
 import { userProfileVerify, verifyUserEmail } from "@/services/api";
-import Snackbar from "../snackbar/page";
 import "bootstrap/dist/css/bootstrap.css";
 import { BsFillCheckCircleFill, BsXCircleFill } from "react-icons/bs";
 import { usePathname } from "next/navigation";
@@ -10,16 +9,11 @@ import { usePathname } from "next/navigation";
 const ModelEmailVerify = ({ showModalverify, closeModalVerify, token }) => {
   let userBearer;
   const pathname = usePathname();
-  const [result, setResult] = useState(null);
-  const [emailVerify, setEmailVerify] = useState(null);
   const [loading, setLoading] = useState(true);
   const [success, setSuccess] = useState(false);
-  const [error, setError] = useState(false);
+  const [verifymailFire, setVerifyMailFire] = useState(false);
 
   const isverifyEmail = pathname === "/auth/verify-email";
-  const handleCloseSnackbar = () => {
-    setResult(null);
-  };
   if (typeof window !== "undefined") {
     userBearer = localStorage.getItem("UserData");
   }
@@ -27,13 +21,9 @@ const ModelEmailVerify = ({ showModalverify, closeModalVerify, token }) => {
     const fetchData = async () => {
       try {
         await userProfileVerify(userBearer);
-        setResult("true");
-        setSuccess(true);
+        setVerifyMailFire(true)
       } catch (error) {
         console.error("Error occurred while verifying email:", error);
-        setResult("false");
-        setError(true);
-
       } finally {
         setLoading(false);
       }
@@ -41,13 +31,9 @@ const ModelEmailVerify = ({ showModalverify, closeModalVerify, token }) => {
     const verifyEmail = async () => {
       try {
         await verifyUserEmail(token);
-        setEmailVerify("true");
         setSuccess(true);
       } catch (error) {
         console.error("Error occurred while verifying email:", error);
-        setEmailVerify("false");
-        setError(true);
-
       } finally {
         setLoading(false);
       }
@@ -65,10 +51,10 @@ const ModelEmailVerify = ({ showModalverify, closeModalVerify, token }) => {
       return "Loading..."; 
     } else if (success) {
       return "Email Verified Successfully";
-    } else if (error) {
-      return "Verification Email Failed. Please try again later."; 
-    } else {
+    } else if (verifymailFire) {
       return "Please check your email for further instructions";
+    } else {
+      return "Verification Email Failed. Please try again later."; 
     }
   };
   return (
@@ -94,7 +80,7 @@ const ModelEmailVerify = ({ showModalverify, closeModalVerify, token }) => {
               <div className="d-flex align-items-center">
                 {loading ? (
                   <div>Loading...</div>
-                ) : success ? (
+                ) : success || verifymailFire ? (
                   <BsFillCheckCircleFill
                     style={{
                       fontSize: "2rem",
@@ -115,7 +101,7 @@ const ModelEmailVerify = ({ showModalverify, closeModalVerify, token }) => {
                     }}
                   />
                 )}
-                <span className={success ? "text-success" : "text-danger"}>
+                <span className={success || verifymailFire? "text-success" : "text-danger"}>
                   {getMessage()}
                 </span>
               </div>
