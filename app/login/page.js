@@ -39,7 +39,7 @@ const LoginForm = () => {
       password,
       captcha,
     };
-    await userLogin(formData)
+    userLogin(formData)
       .then((res) => {
         setResult({ success: true, message: "Login Successfully!" });
         const { token } = res;
