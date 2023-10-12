@@ -5,7 +5,7 @@ import * as Yup from "yup";
 import { signUp } from "@/services/api";
 import "bootstrap/dist/css/bootstrap.css";
 import { useRouter } from "next/navigation";
-import Snackbar from "@/component/snackbar/page";
+import Snackbar from "../components/snackbar/page";
 
 const RegisterForm = () => {
   const [result, setResult] = useState(null);
@@ -31,7 +31,6 @@ const RegisterForm = () => {
   });
 
   const handleSubmit = (values) => {
-    console.log(values);
     signUp(values)
       .then((res) => {
         setResult({ success: true, message: "Registered successfully!" });

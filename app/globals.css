@@ -121,3 +121,9 @@ body{
   box-shadow: 0 8px 20px 0px #1f1f1f1a;
   overflow: hidden;
 }
+
+@media screen and (min-width:992px){
+  .nav-item {
+  line-height:80px;
+  }
+}

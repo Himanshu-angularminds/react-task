@@ -1,16 +1,21 @@
 "use client";
-import React, { useState } from "react";
+import React, {useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useRouter } from "next/navigation";
 import "bootstrap/dist/css/bootstrap.css";
-import { userLogin } from "@/services/api";
-import Snackbar from "@/component/snackbar/page";
+import { socialLogin, userLogin } from "@/services/api";
+import Snackbar from "../components/snackbar/page";
+import ModelForget from "../components/Model/ModelForget";
+import GoogleLogin from "@dump-work/react-google-login";
 
 const LoginForm = () => {
-  const [result, setResult] = useState(null);
   const router = useRouter();
+  const siteKey = process?.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
+  const googleSecretKey = process?.env.NEXT_PUBLIC_GOOGLE_SECRET_KEY;
 
+  const [showModal, setShowModal] = useState(false);
+  const [result, setResult] = useState(null);
   const handleCloseSnackbar = () => {
     setResult(null);
   };
@@ -27,9 +32,16 @@ const LoginForm = () => {
   });
 
   const handleSubmit = async (values) => {
-    await userLogin(values)
+    let captcha = await reCAPTCHA();
+    const { email, password } = values;
+    const formData = {
+      email,
+      password,
+      captcha,
+    };
+    await userLogin(formData)
       .then((res) => {
-        setResult({ success: true, message: "Data retrieved successfully!" });
+        setResult({ success: true, message: "Login Successfully!" });
         const { token } = res;
         localStorage.setItem("UserData", token);
         if (res) {
@@ -40,6 +52,47 @@ const LoginForm = () => {
         setResult({ success: false, error: err.response.data.message });
         console.log(err, "getting error api ");
       });
+  };
+
+  const reCAPTCHA = () => {
+    const { grecaptcha } = window;
+    return new Promise((resolve, reject) => {
+      grecaptcha.ready(function () {
+        grecaptcha
+          .execute(siteKey, { action: "submit" })
+          .then(function (token) {
+            resolve(token);
+          })
+          .catch(function (err) {
+            console.error(err);
+            reject(err);
+          });
+      });
+    });
+  };
+
+  const handleGoogleResponse = async (response) => {
+    let reCaptcha = await reCAPTCHA();
+    const { tokenObj } = response;
+    const data = {
+      token: tokenObj.id_token,
+      captcha: reCaptcha
+    }
+    if (tokenObj) {
+      await socialLogin(data)
+        .then((res) => {
+          setResult({ success: true, message: "Login Successfully!" });
+          const { token } = res;
+          localStorage.setItem("UserData", token);
+          if (res) {
+            router.push("/my-profile");
+          }
+        })
+        .catch((err) => {
+          setResult({ success: false, error: err.response.data.message });
+          console.log(err, "getting error api ");
+        });
+    }
   };
 
   return (
@@ -89,14 +142,35 @@ const LoginForm = () => {
                       component="div"
                       className="text-danger"
                     />
+                    <div className="row mb-4 mt-5">
+                      <div className="col d-flex justify-content-center">
+                        <p>
+                          Dont have an account? <a href="/register">Sign Up</a>
+                        </p>
+                      </div>
+                      <div className="col">
+                        <a href="#!" onClick={() => setShowModal(true)}>
+                          Forgot password?
+                        </a>
+                      </div>
+                    </div>
                   </div>
-                  <p>
-                    Dont have an account? <a href="/register">Sign Up</a>
-                  </p>
                   <div className="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
-                    <button type="submit" className="btn btn-primary btn-lg">
+                    <button
+                      type="submit"
+                      className="btn btn-outline-danger btn-lg "
+                    >
                       Sign In
                     </button>
+                    <div className="ml-3 btn mr-3">
+                      <GoogleLogin
+                        clientId={googleSecretKey}
+                        buttonText="Continue with google "
+                        onSuccess={handleGoogleResponse}
+                        onFailure={handleGoogleResponse}
+                        cookiePolicy={"single_host_origin"}
+                      />
+                    </div>
                   </div>
                 </Form>
               </Formik>
@@ -104,6 +178,10 @@ const LoginForm = () => {
           </div>
         </div>
       </div>
+      <ModelForget
+        showModal={showModal}
+        closeModal={() => setShowModal(false)}
+      />
       <div
         style={{
           position: "absolute",
@@ -112,7 +190,7 @@ const LoginForm = () => {
           zIndex: "9999",
         }}
       >
-      {result && <Snackbar result={result} onClose={handleCloseSnackbar} />}
+        {result && <Snackbar result={result} onClose={handleCloseSnackbar} />}
       </div>
     </div>
   );
