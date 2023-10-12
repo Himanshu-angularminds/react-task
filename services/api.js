@@ -7,6 +7,11 @@ export const userLogin = (data) => {
   return fetchApi(`${baseUrl}/auth/login`, "POST", data);
 };
 
+//Socail Login
+export const socialLogin = (data) => {
+  return fetchApi(`${baseUrl}/auth/login/google`, "POST", data);
+};
+
 export const signUp = (data) => {
   return fetchApi(`${baseUrl}/auth/register?captcha=false`, "POST", data);
 };
@@ -27,7 +32,6 @@ export const userProfileVerify = (bearer) => {
 };
 
 export const verifyUserEmail = (token) => {
-  console.log(token,"im verified api call");
   return fetchApi(`${baseUrl}/auth/verify-email?token=${token}`, "POST");
 };
 

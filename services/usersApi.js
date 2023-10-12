@@ -32,7 +32,6 @@ export const UpdateUserRole = async (userId,data,userBearer) => {
 };
 
 export const DeleteUser = async (userId, userBearer) => {
-  console.log(userId, userBearer,"userId, userBearer342");
   let auth = { Authorization: `Bearer ${userBearer}` };
   return await fetchApi(`${baseUrl}/users/${userId}`, "DELETE", "", auth);
 };

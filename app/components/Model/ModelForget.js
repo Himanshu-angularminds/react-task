@@ -52,11 +52,9 @@ const ModelForget = ({ showModal, closeModal, token }) => {
             formData = {
               password,
             };
-            console.log(formData, "token");
             await userRestPassword(token, formData);
             router.push("/login");
           } else {
-            console.log(formData, "formData");
             await userForget(formData);
           }
           closeModal();

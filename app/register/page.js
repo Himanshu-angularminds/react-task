@@ -31,7 +31,6 @@ const RegisterForm = () => {
   });
 
   const handleSubmit = (values) => {
-    console.log(values);
     signUp(values)
       .then((res) => {
         setResult({ success: true, message: "Registered successfully!" });
