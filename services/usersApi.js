@@ -2,7 +2,6 @@ import fetchApi from "@/utils/fetchApi";
 const baseUrl = "https://shop-api.ngminds.com";
 
 export const GetUser = async ({ userBearer, page, limit, role,name }) => {
-  // console.log(userBearer, page, limit, role,":api:::---check");
   let auth = { Authorization: `Bearer ${userBearer}` };
   let apiUrl = `${baseUrl}/users?page=${page}&limit=${limit}`;
   if (role && role !== "all") {
@@ -10,7 +9,6 @@ export const GetUser = async ({ userBearer, page, limit, role,name }) => {
   }else if(name){
     apiUrl += `&name=${name}`;
   }
-  console.log(apiUrl,"apiUrlURL:____");
   return await fetchApi(apiUrl, "GET", "", auth);
 };
 
