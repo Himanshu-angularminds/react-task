@@ -18,44 +18,28 @@ const UserDataTable = () => {
   const [result, setResult] = useState(null);
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [searchText, setSearchText] = useState("");
+  const [sort, setSort] = useState({ field: "id", direction: "asc" });
   const [pagination, setPagination] = useState({
     totalRows: 0,
     perPage: 10,
     page: 1,
   });
+  const userBearer = localStorage.getItem("UserData");
+
   const handleCloseSnackbar = () => {
     setResult(null);
   };
-  const handleClosemodel = () => {
-    setShowModal(false)
-    setSelectedUserId(null)
+
+  const handlePageChange = (page) => {
+    setPagination((prev) => ({ ...prev, page }));
   };
-  //   const [sort, setSort] = useState({ field: "id", direction: "asc" });
-  const [sort, setSort] = useState({});
-  const userBearer = localStorage.getItem("UserData");
 
-  useEffect(() => {
-    fetchData();
-  }, [refreshApi]);
-
-  const fetchData = async () => {
-    try {
-      const response = await GetUser({
-        userBearer,
-        page: pagination.page,
-        limit: pagination.perPage,
-        sort: `${sort.field},${sort.direction}`,
-      });
-      setUserData(response.results);
-      setPagination((prev) => ({
-        ...prev,
-        totalRows: response.totalResults,
-      }));
-      setLoading(false);
-    } catch (error) {
-      console.error(error);
-      setLoading(false);
-    }
+  const handleSort = (column, direction) => {
+    setSort({ field: column.selector, direction });
+  };
+  const handleClosemodel = () => {
+    setShowModal(false);
+    setSelectedUserId(null);
   };
 
   const columns = [
@@ -102,13 +86,7 @@ const UserDataTable = () => {
     },
   ];
 
-  const handlePageChange = (page) => {
-    setPagination((prev) => ({ ...prev, page }));
-  };
 
-  const handleSort = (column, direction) => {
-    setSort({ field: column.selector, direction });
-  };
 
   const handleEdit = (userId) => {
     setSelectedUserId(userId);
@@ -125,7 +103,10 @@ const UserDataTable = () => {
       await DeleteUser(userId, userBearer);
       setResult({ success: true, message: "Password Changed Successfully!" });
       setDeleteModel(false);
-      setRefreshApi(true);
+      setPagination((prev) => ({
+        ...prev,
+        page: 1,
+      }));
     } catch (error) {
       console.error(error);
       setResult({
@@ -154,6 +135,30 @@ const UserDataTable = () => {
       },
     },
   };
+
+  const fetchData = async () => {
+    try {
+      const response = await GetUser({
+        userBearer,
+        page: pagination.page,
+        limit: pagination.perPage,
+        sort: `${sort.field},${sort.direction}`,
+      });
+      setUserData(response.results);
+      setPagination((prev) => ({
+        ...prev,
+        totalRows: response.totalResults,
+      }));
+      setLoading(false);
+    } catch (error) {
+      console.error(error);
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [refreshApi, pagination.page, pagination.perPage]);
 
   return (
     <>

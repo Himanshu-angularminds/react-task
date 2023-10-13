@@ -6,6 +6,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import ModelChangePassword from "../Model/ModelChangePassword";
 import { useRouter } from "next/navigation";
 import ModelEmailVerify from "../Model/ModelEmailVerify";
+import { BsPersonCircle } from "react-icons/bs";
 
 const Navbar = ({ currentUser }) => {
   const [showModal, setShowModal] = useState(false);
@@ -22,58 +23,59 @@ const Navbar = ({ currentUser }) => {
         id="headerNav"
       >
         <div className="container-fluid">
-          <ul className="navbar-nav">
-            <li className="nav-item d-none d-lg-block">
-              <a className="nav-link mx-2" href="#">
-                <img
-                  className="rounded-circle"
-                  src="https://images.crunchbase.com/image/upload/c_lpad,f_auto,q_auto:eco,dpr_1/h0kvromeujgdyexmj42o"
-                  height="80"
-                  alt="Logo"
-                />
-              </a>
-            </li>
-            <li className="nav-item">
-              <a className="navbar-brand d-block d-lg-none" href="#">
-                <img
-                  src="https://images.crunchbase.com/image/upload/c_lpad,f_auto,q_auto:eco,dpr_1/h0kvromeujgdyexmj42o"
-                  height="80"
-                  alt="Logo"
-                />
-              </a>
-            </li>
-            <li className="nav-item">
-              <a
-                className="nav-link mx-2 active"
-                aria-current="page"
-                href="my-profile"
-              >
-                Home
-              </a>
-            </li>
-            <li className="nav-item">
-              <a className="nav-link mx-2" href="/users">
-                User
-              </a>
-            </li>
-          </ul>
-
-          <div
-            className="collapse navbar-collapse justify-content-end"
-            id="navbarNavDarkDropdown"
+          <a className="navbar-brand" href="#">
+            <img
+              className="rounded-circle"
+              src="https://images.crunchbase.com/image/upload/c_lpad,f_auto,q_auto:eco,dpr_1/h0kvromeujgdyexmj42o"
+              height="80"
+              alt="Logo"
+            />
+          </a>
+          <button
+            className="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarNav"
+            aria-controls="navbarNav"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
           >
-            <ul className="navbar-nav justify-content-end">
-              <li className="dropdown">
+            <span className="navbar-toggler-icon"></span>
+          </button>
+          <div className="collapse navbar-collapse" id="navbarNav">
+            <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+              <li className="nav-item">
+                <a className="nav-link" href="my-profile">
+                  Home
+                </a>
+              </li>
+              <li className="nav-item">
+                <a className="nav-link" href="/users">
+                  User
+                </a>
+              </li>
+            </ul>
+            <ul className="navbar-nav">
+              <li className="nav-item dropdown">
                 <a
                   className="nav-link dropdown-toggle"
                   href="#"
+                  id="navbarDropdown"
                   role="button"
                   data-bs-toggle="dropdown"
                   aria-expanded="false"
                 >
-                Account
+                  <BsPersonCircle style={{
+                      fontSize: "2rem",
+                      color: "white",
+                      width: "34px",
+                      height: "34px",
+                    }}/>
                 </a>
-                <ul className="dropdown-menu dropdown-menu-dark dropdown-menu-end">
+                <ul
+                  className="dropdown-menu dropdown-menu-dark dropdown-menu-end"
+                  aria-labelledby="navbarDropdown"
+                >
                   <li>
                     <a
                       className="dropdown-item"
@@ -88,7 +90,7 @@ const Navbar = ({ currentUser }) => {
                       className="dropdown-item"
                       href="#"
                       onClick={() => setShowModalVerify(true)}
-                      >
+                    >
                       Email Verification
                     </a>
                   </li>
