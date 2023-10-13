@@ -36,9 +36,9 @@ const UserDataTable = () => {
     setPagination((prev) => ({ ...prev, page }));
   };
 
-  const handleSort = (column, direction) => {
-    setSort({ field: column.selector, direction });
-  };
+  // const handleSort = (column, direction) => {
+  //   setSort({ field: column.selector, direction });
+  // };
   const handleClosemodel = () => {
     setShowModal(false);
     setSelectedUserId(null);
@@ -232,7 +232,7 @@ const UserDataTable = () => {
             setPagination((prev) => ({ ...prev, perPage, page: 1 }))
           }
           onChangePage={handlePageChange}
-          onSort={handleSort}
+          // onSort={handleSort}
           sortServer
           progressPending={loading}
           striped
