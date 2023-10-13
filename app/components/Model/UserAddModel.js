@@ -13,10 +13,11 @@ import {
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-const UserAdd = ({ show, handleClose, userId, setRefreshApi }) => {
+const UserAdd = ({ show, handleClose, userId, setRefreshApi, refreshApi }) => {
   const [result, setResult] = useState(null);
   const userBearer = localStorage.getItem("UserData");
-  const isEditMode = userId !== null;
+  let isEditMode = userId !== null;
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const handleCloseSnackbar = () => {
     setResult(null);
   };
@@ -38,6 +39,7 @@ const UserAdd = ({ show, handleClose, userId, setRefreshApi }) => {
       role: Yup.string().required("Role Required"),
     }),
     onSubmit: async (values, { resetForm }) => {
+      setIsSubmitting(true);
       try {
         if (isEditMode) {
           const { email, name } = values;
@@ -47,28 +49,27 @@ const UserAdd = ({ show, handleClose, userId, setRefreshApi }) => {
           };
       
           await UpdateUserDetail(userId, updateData, userBearer);
-          setRefreshApi(true);
-          handleClose();
-          resetForm();
-          setResult({
-            success: true,
-            message: "User Updated Successfully!",
-          });
         } else {
           await CreateUser(values, userBearer);
-          setRefreshApi(true);
-          handleClose();
-          resetForm();
-          setResult({
-            success: true,
-            message: "User Created Successfully!",
-          });
         }
+        setRefreshApi(!refreshApi);
+        resetForm();
+        handleClose();
+        setResult({
+          success: true,
+          message: isEditMode
+            ? "User Updated Successfully!"
+            : "User Created Successfully!",
+        });
       } catch (error) {
         console.error("User API Error: ", error);
       
         let errorMessage = "An error occurred";
-        if (error.response && error.response.data && error.response.data.message) {
+        if (
+          error.response &&
+          error.response.data &&
+          error.response.data.message
+        ) {
           errorMessage = error.response.data.message;
         }
       
@@ -76,6 +77,8 @@ const UserAdd = ({ show, handleClose, userId, setRefreshApi }) => {
           success: false,
           error: errorMessage,
         });
+      } finally {
+        setIsSubmitting(false); // Set isSubmitting to false after form submission is completed
       }
       
     },
@@ -94,11 +97,10 @@ const UserAdd = ({ show, handleClose, userId, setRefreshApi }) => {
         console.error("Get User Detail API Error: ", error);
       }
     };
-  
     if (isEditMode) {
       fetchData();
     }
-  }, [isEditMode, userBearer, userId]);
+  }, [isEditMode, userBearer, userId,show]);
   
 
   const handleRoleUpdate = async (userId, updatedRole) => {
@@ -106,7 +108,7 @@ const UserAdd = ({ show, handleClose, userId, setRefreshApi }) => {
     const role = { role: updatedRole };
     try {
       UpdateUserRole(userId, role, userBearer);
-      setRefreshApi(true);
+      setRefreshApi(!refreshApi);
       handleClose();
       resetForm();
       setResult({
@@ -116,7 +118,7 @@ const UserAdd = ({ show, handleClose, userId, setRefreshApi }) => {
     } catch (error) {
       setResult({
         success: false,
-        error: error.response?.data?.message || "An error occurred",
+        error: "An error occurred while updating user role.",
       });
     }
   };
@@ -209,6 +211,7 @@ const UserAdd = ({ show, handleClose, userId, setRefreshApi }) => {
                       onClick={() => {
                         handleRoleUpdate(userId, formik.values.role);
                       }}
+                      disabled={isSubmitting}
                     >
                       Role Update
                     </button>
@@ -218,6 +221,7 @@ const UserAdd = ({ show, handleClose, userId, setRefreshApi }) => {
                 <button
                   type="submit"
                   className="btn btn-danger mt-3 d-flex justify-content-center"
+                  disabled={isSubmitting}
                 >
                   {!isEditMode ? "Create User" : "Update User"}
                 </button>

@@ -26,6 +26,10 @@ const UserDataTable = () => {
   const handleCloseSnackbar = () => {
     setResult(null);
   };
+  const handleClosemodel = () => {
+    setShowModal(false)
+    setSelectedUserId(null)
+  };
   //   const [sort, setSort] = useState({ field: "id", direction: "asc" });
   const [sort, setSort] = useState({});
   const userBearer = localStorage.getItem("UserData");
@@ -190,7 +194,7 @@ const UserDataTable = () => {
             setPagination((prev) => ({ ...prev, perPage, page: 1 }))
           }
           onChangePage={handlePageChange}
-          sortactive={handleSort}
+          onSort={handleSort}
           sortServer
           progressPending={loading}
           striped
@@ -201,9 +205,10 @@ const UserDataTable = () => {
       </div>
       <UserAdd
         setRefreshApi={setRefreshApi}
+        refreshApi={refreshApi}
         userId={selectedUserId}
         show={showModal}
-        handleClose={() => setShowModal(false)}
+        handleClose={handleClosemodel}
       />
       <DeleteConfirmationModal
         show={deletemodel}
