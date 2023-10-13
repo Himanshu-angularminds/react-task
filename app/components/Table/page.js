@@ -8,6 +8,7 @@ import { BsPencil, BsTrash } from "react-icons/bs";
 import UserAdd from "../Model/UserAddModel";
 import DeleteConfirmationModal from "../Model/DeleteUserModel";
 import Snackbar from "../snackbar/page";
+import debounce from "lodash/debounce";
 
 const UserDataTable = () => {
   const [userData, setUserData] = useState([]);
@@ -18,7 +19,8 @@ const UserDataTable = () => {
   const [result, setResult] = useState(null);
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [searchText, setSearchText] = useState("");
-  const [sort, setSort] = useState({ field: "id", direction: "asc" });
+  const [selectedRole, setSelectedRole] = useState("");
+  // const [sort, setSort] = useState({ field: "id", direction: "asc" });
   const [pagination, setPagination] = useState({
     totalRows: 0,
     perPage: 10,
@@ -137,13 +139,19 @@ const UserDataTable = () => {
   };
 
   const fetchData = async () => {
+    let queryParams = {
+      userBearer,
+      page: pagination.page,
+      limit: pagination.perPage,
+      // sort: `${sort.field},${sort.direction}`,
+    };
+    if (selectedRole) {
+      queryParams.role = selectedRole;
+    }else if(searchText){
+      queryParams.name = searchText;
+    }
     try {
-      const response = await GetUser({
-        userBearer,
-        page: pagination.page,
-        limit: pagination.perPage,
-        sort: `${sort.field},${sort.direction}`,
-      });
+      const response = await GetUser(queryParams);
       setUserData(response.results);
       setPagination((prev) => ({
         ...prev,
@@ -156,21 +164,46 @@ const UserDataTable = () => {
     }
   };
 
+  const updateQuery = (e) => setSearchText(e?.target?.value);
+  const debouncedOnChange = debounce(updateQuery, 500);
+
   useEffect(() => {
     fetchData();
-  }, [refreshApi, pagination.page, pagination.perPage]);
+  }, [
+    refreshApi,
+    pagination.page,
+    pagination.perPage,
+    selectedRole,
+    searchText,
+  ]);
 
   return (
     <>
       <div className="container mt-5">
-        <div className="mt-3 mb-5 d-flex justify-content-end align-items-center">
+        <div className="mt-3 mb-5 d-flex justify-content-end align-items-center mr-1">
+          <div className="col-md-1 me-2">
+            <select
+              className="form-select"
+              id="role"
+              value={selectedRole}
+              onChange={(e) => setSelectedRole(e.target.value)}
+              // {...formik.getFieldProps("role")}
+            >
+              <option value="all" defaultChecked>
+                All
+              </option>
+              <option value="user">User</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
           <div className="d-flex mt-10">
             <input
               type="text"
               className="form-control me-2"
               placeholder="Search"
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
+              // value={searchText}
+              onChange={debouncedOnChange}
+              // onChange={(e) => setSearchText(e.target.value)}
             />
           </div>
           <button
