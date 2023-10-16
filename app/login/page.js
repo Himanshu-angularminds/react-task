@@ -9,6 +9,8 @@ import Snackbar from "../components/snackbar/page";
 import ModelForget from "../components/Model/ModelForget";
 import GoogleLogin from "@dump-work/react-google-login";
 import Script from "next/script";
+import Lottie from "lottie-react";
+import animationData from '../../public/login.json'
 
 const LoginForm = () => {
   const router = useRouter();
@@ -97,13 +99,14 @@ const LoginForm = () => {
             <div className="col col-xl-10">
               <div className="card" style={{ borderRadius: "1rem" }}>
                 <div className="row g-0">
-                  <div className="col-md-6 col-lg-5 d-none d-md-block">
-                    <img
+                  <div className="col-md-6 col-lg-5 mt-5">
+                    {/* <img
                       src="login_image.svg"
                       alt="login form"
                       className="img-fluid"
                       style={{ borderRadius: "1rem 0 0 1rem" }}
-                    />
+                    /> */}
+                    <Lottie animationData={animationData} />
                   </div>
                   <div className="col-md-6 col-lg-7 d-flex align-items-center">
                     <div className="card-body p-4 p-lg-5 text-black">
