@@ -6,6 +6,8 @@ import { signUp } from "@/services/api";
 import "bootstrap/dist/css/bootstrap.css";
 import { useRouter } from "next/navigation";
 import Snackbar from "../components/snackbar/page";
+import Lottie from "lottie-react";
+import animationData from "../../public/register.json";
 
 const RegisterForm = () => {
   const [result, setResult] = useState(null);
@@ -51,13 +53,14 @@ const RegisterForm = () => {
               <div className="col col-xl-10">
                 <div className="card" style={{ borderRadius: "1rem" }}>
                   <div className="row g-0">
-                    <div className="col-md-6 mt-40px col-lg-5">
-                      <img
+                    <div className="col-md-6 mt-40px col-lg-5 mt-5">
+                      {/* <img
                         src="sign_up.svg"
                         alt="sign_up form"
                         className="img-fluid"
                         style={{ borderRadius: "1rem 0 0 1rem" }}
-                      />
+                      /> */}
+                      <Lottie animationData={animationData} />
                     </div>
                     <div className="col-md-6 col-lg-7 d-flex align-items-center">
                       <div className="card-body p-4 p-lg-5 text-black">
@@ -154,12 +157,11 @@ const RegisterForm = () => {
                               </button>
                             </div>
 
-                            
                             <p
                               className="mb-5 pb-lg-2"
                               style={{ color: "#393f81" }}
                             >
-                              Already a member {" "}
+                              Already a member{" "}
                               <a href="/login" style={{ color: "#393f81" }}>
                                 Login here
                               </a>
@@ -176,15 +178,15 @@ const RegisterForm = () => {
         </section>
       </div>
       <div
-          style={{
-            position: "absolute",
-            top: "20px",
-            right: "20px",
-            zIndex: "9999",
-          }}
-        >
-          {result && <Snackbar result={result} onClose={handleCloseSnackbar} />}
-        </div>
+        style={{
+          position: "absolute",
+          top: "20px",
+          right: "20px",
+          zIndex: "9999",
+        }}
+      >
+        {result && <Snackbar result={result} onClose={handleCloseSnackbar} />}
+      </div>
     </>
   );
 };
