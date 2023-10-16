@@ -7,11 +7,14 @@ import ModelChangePassword from "../Model/ModelChangePassword";
 import { useRouter } from "next/navigation";
 import ModelEmailVerify from "../Model/ModelEmailVerify";
 import { BsPersonCircle } from "react-icons/bs";
+import { usePathname } from "next/navigation";
+
 
 const Navbar = ({ currentUser }) => {
   const [showModal, setShowModal] = useState(false);
   const [showModalverify, setShowModalVerify] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
   const handleLogout = () => {
     localStorage.removeItem("UserData");
     router.push("/login");
@@ -45,12 +48,12 @@ const Navbar = ({ currentUser }) => {
           <div className="collapse navbar-collapse" id="navbarNav">
             <ul className="navbar-nav me-auto mb-2 mb-lg-0">
               <li className="nav-item">
-                <a className="nav-link" href="my-profile">
+                <a className={`nav-link ${pathname === "/my-profile" ? "active": ""}`} href="my-profile">
                   Profile
                 </a>
               </li>
               <li className="nav-item">
-                <a className="nav-link" href="/users">
+              <a className={`nav-link ${pathname === "/users" ? "active": ""}`} href="users">
                   User Data
                 </a>
               </li>

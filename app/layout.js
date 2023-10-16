@@ -14,7 +14,6 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <head>
-        <Script src="https://www.google.com/recaptcha/api.js?render=6LevmbQZAAAAAMSCjcpJmuCr4eIgmjxEI7bvbmRI"></Script>
         <body className={inter.className}>{children}</body>
       </head>
     </html>
