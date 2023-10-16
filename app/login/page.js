@@ -8,6 +8,7 @@ import { socialLogin, userLogin } from "@/services/api";
 import Snackbar from "../components/snackbar/page";
 import ModelForget from "../components/Model/ModelForget";
 import GoogleLogin from "@dump-work/react-google-login";
+import Script from "next/script";
 
 const LoginForm = () => {
   const router = useRouter();
@@ -89,6 +90,7 @@ const LoginForm = () => {
 
   return (
     <div>
+      <Script src="https://www.google.com/recaptcha/api.js?render=6LevmbQZAAAAAMSCjcpJmuCr4eIgmjxEI7bvbmRI" />
       <section style={{ backgroundColor: "#DC3545" }}>
         <div className="container py-5 ">
           <div className="row d-flex justify-content-center align-items-center ">
