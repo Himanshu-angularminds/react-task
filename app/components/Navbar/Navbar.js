@@ -19,7 +19,6 @@ const Navbar = ({ currentUser }) => {
     localStorage.removeItem("UserData");
     router.push("/login");
   };
-  console.log(pathname,'pathname');
   return (
     <>
       <nav
