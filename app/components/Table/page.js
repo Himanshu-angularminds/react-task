@@ -165,7 +165,7 @@ const UserDataTable = () => {
   };
 
   const updateQuery = (e) => setSearchText(e?.target?.value);
-  const debouncedOnChange = debounce(updateQuery, 500);
+  const debouncedOnChange = debounce(updateQuery, 400);
 
   useEffect(() => {
     fetchData();
