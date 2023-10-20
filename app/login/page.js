@@ -5,9 +5,8 @@ import * as Yup from "yup";
 import { useRouter } from "next/navigation";
 import "bootstrap/dist/css/bootstrap.css";
 import Snackbar from "@/component/snackbar/page";
-// import { signIn } from "next-auth/react";
-import { userLogin } from "@/services/api";
 import { signIn } from "next-auth/react";
+import { userLogin } from "@/services/api";
 
 const LoginForm = () => {
   const [result, setResult] = useState(null);
@@ -36,7 +35,6 @@ const LoginForm = () => {
       console.log(response, "API Response");
       if (response.user) {
         // Sign in the user
-        console.log("click in singIn");
         try {
           
         signIn("credentials", {

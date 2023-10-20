@@ -4,8 +4,11 @@ import AuthGuard from "@/utils/authGuard";
 import { userProfile } from "@/services/api";
 import { useRouter } from "next/navigation";
 import "bootstrap/dist/css/bootstrap.css";
+import { useSession } from "next-auth/react"
 
 const Profile = () => {
+  const { data } = useSession()
+  console.log(data,"session DATA from client");
   const [userData, setUserData] = useState(null);
   const [formValues, setFormValues] = useState({
     name: "",
