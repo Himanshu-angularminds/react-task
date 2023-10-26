@@ -4,13 +4,23 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useRouter } from "next/navigation";
 import "bootstrap/dist/css/bootstrap.css";
-import Snackbar from "@/component/snackbar/page";
+import { socialLogin, userLogin } from "@/services/api";
+import Snackbar from "../components/snackbar/page";
+import ModelForget from "../components/Model/ModelForget";
+import GoogleLogin from "@dump-work/react-google-login";
+import Script from "next/script";
+import Lottie from "lottie-react";
+import animationData from '../../public/login.json'
 import { signIn } from "next-auth/react";
-import { userLogin } from "@/services/api";
+
 
 const LoginForm = () => {
-  const [result, setResult] = useState(null);
   const router = useRouter();
+  const siteKey = process?.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
+  const googleSecretKey = process?.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+
+  const [showModal, setShowModal] = useState(false);
+  const [result, setResult] = useState(null);
   const handleCloseSnackbar = () => {
     setResult(null);
   };
@@ -28,109 +38,190 @@ const LoginForm = () => {
 
   const handleSubmit = async (values) => {
     try {
-      const response = await userLogin({
-        email: values.email,
-        password: values.password,
+      let captcha = await reCAPTCHA();
+      const { email, password } = values;
+      const formData = {
+        email,
+        password,
+        captcha,
+      };
+      const res = await userLogin(formData);
+      signIn("credentials", {
+        redirect: false,
+        email:JSON.stringify(res)
       });
-      console.log(response, "API Response");
-      if (response.user) {
-        // Sign in the user
-        try {
-          
-        signIn("credentials", {
-          redirect: false,
-          email:JSON.stringify(response)
-        });
-        } catch (error) {
-          console.error("error in sign in ::", error);
-        }
-
-        localStorage.setItem("UserData", response.token);
-        router.push("/my-profile");
-      } else {
-        setResult({ success: false, error: "Invalid credentials" });
-      }
+      setResult({ success: true, message: "Login Successfully!" });
+      const { token } = res;
+      localStorage.setItem("UserData", token);
+      router.push("/my-profile");
     } catch (error) {
-      console.error("Error during login:", error);
+      setResult({ success: false, error: error.response?.data?.message });
+      console.error(error);
+    }
+  };
 
-      // Handle specific types of errors if needed
-      if (error.statusCode === 401) {
-        setResult({ success: false, error: "Invalid credentials" });
-      } else {
-        setResult({ success: false, error: "Error occurred during login" });
-      }
+  const reCAPTCHA = () => {
+    const { grecaptcha } = window;
+    return new Promise((resolve, reject) => {
+      grecaptcha.ready(function () {
+        grecaptcha
+          .execute(siteKey, { action: "submit" })
+          .then(function (token) {
+            resolve(token);
+          })
+          .catch(function (err) {
+            console.error(err);
+            reject(err);
+          });
+      });
+    });
+  };
+
+  const handleGoogleResponse = async (response) => {
+    try {
+      let reCaptcha = await reCAPTCHA();
+      const { tokenObj } = response;
+      const data = {
+        token: tokenObj.id_token,
+        captcha: reCaptcha,
+      };
+      const res = await socialLogin(data);
+      setResult({ success: true, message: "Login Successfully!" });
+      const { token } = res;
+      localStorage.setItem("UserData", token);
+      router.push("/my-profile");
+    } catch (error) {
+      setResult({ success: false, error: error.response?.data?.message });
+      console.error(error);
     }
   };
 
   return (
-    <div className="card-body p-5 ">
-      <div className="row justify-content-center mb-5 mt-5">
-        <div className="col-lg-6">
-          <div className="card shadow-lg">
-            <div className="card-body">
-              <h2 className="fw-bold mt-2 mb-4 text-uppercase card-title text-center">
-                Login
-              </h2>
-              <Formik
-                initialValues={initialValues}
-                validationSchema={validationSchema}
-                onSubmit={handleSubmit}
-              >
-                <Form>
-                  <div className="mb-3">
-                    <label htmlFor="email" className="form-label">
-                      Email
-                    </label>
-                    <Field
-                      type="email"
-                      id="email"
-                      name="email"
-                      className="form-control"
-                    />
-                    <ErrorMessage
-                      name="email"
-                      component="div"
-                      className="text-danger"
-                    />
+    <div>
+      <Script src="https://www.google.com/recaptcha/api.js?render=6LevmbQZAAAAAMSCjcpJmuCr4eIgmjxEI7bvbmRI" />
+      <section style={{ backgroundColor: "#DC3545" }}>
+        <div className="container py-5 ">
+          <div className="row d-flex justify-content-center align-items-center ">
+            <div className="col col-xl-10">
+              <div className="card" style={{ borderRadius: "1rem" }}>
+                <div className="row g-0">
+                  <div className="col-md-6 col-lg-5 mt-5">
+                    {/* <img
+                      src="login_image.svg"
+                      alt="login form"
+                      className="img-fluid"
+                      style={{ borderRadius: "1rem 0 0 1rem" }}
+                    /> */}
+                    <Lottie animationData={animationData} />
                   </div>
+                  <div className="col-md-6 col-lg-7 d-flex align-items-center">
+                    <div className="card-body p-4 p-lg-5 text-black">
+                      <Formik
+                        initialValues={initialValues}
+                        validationSchema={validationSchema}
+                        onSubmit={handleSubmit}
+                      >
+                        <Form>
+                          <div className="d-flex align-items-center mb-3 pb-1">
+                            <i
+                              className="fas fa-cubes fa-2x me-3"
+                              style={{ color: "#ff6219" }}
+                            ></i>
+                            <span className="h1 fw-bold mb-0">Login</span>
+                          </div>
 
-                  <div className="mb-3">
-                    <label htmlFor="password" className="form-label">
-                      Password
-                    </label>
-                    <Field
-                      type="password"
-                      id="password"
-                      name="password"
-                      className="form-control"
-                    />
-                    <ErrorMessage
-                      name="password"
-                      component="div"
-                      className="text-danger"
-                    />
+                          <h5
+                            className="fw-normal mb-3 pb-3"
+                            style={{ letterSpacing: "1px" }}
+                          >
+                            Sign into your account
+                          </h5>
+
+                          <div className="form-outline mb-4">
+                            <label htmlFor="email" className="form-label">
+                              Email
+                            </label>
+                            <Field
+                              type="email"
+                              id="email"
+                              name="email"
+                              className="form-control form-control-lg"
+                            />
+                            {/* <label className="form-label" for="form2Example17">
+                              Email address
+                            </label> */}
+                            <ErrorMessage
+                              name="email"
+                              component="div"
+                              className="text-danger"
+                            />
+                          </div>
+
+                          <div className="form-outline mb-4">
+                            <label htmlFor="password" className="form-label">
+                              Password
+                            </label>
+                            <Field
+                              type="password"
+                              id="password"
+                              name="password"
+                              className="form-control form-control-lg"
+                            />
+                            <ErrorMessage
+                              name="password"
+                              component="div"
+                              className="text-danger"
+                            />
+                          </div>
+
+                          <div className="pt-1 mb-4">
+                            <button
+                              type="submit"
+                              className="btn btn-outline-danger btn-lg "
+                            >
+                              Sign In
+                            </button>
+
+                            <div className="ml-3 btn mr-3">
+                              <GoogleLogin
+                                clientId={googleSecretKey}
+                                buttonText="Continue with google "
+                                onSuccess={handleGoogleResponse}
+                                onFailure={handleGoogleResponse}
+                                cookiePolicy={"single_host_origin"}
+                              />
+                            </div>
+                          </div>
+                          <a
+                            className="small text-muted"
+                            href="#!"
+                            onClick={() => setShowModal(true)}
+                          >
+                            Forgot password?
+                          </a>
+                          <p
+                            className="mb-5 pb-lg-2"
+                            style={{ color: "#393f81" }}
+                          >
+                            Dont have an account?{" "}
+                            <a href="/register" style={{ color: "#393f81" }}>
+                              Register here
+                            </a>
+                          </p>
+                        </Form>
+                      </Formik>
+                    </div>
                   </div>
-                  <p>
-                    Dont have an account? <a href="/register">Sign Up</a>
-                  </p>
-                  <div className="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
-                    <button
-                      type="submit"
-                      className="btn btn-primary btn-lg"
-                      onClick={() => {
-                        console.log("hello");
-                        // signIn()
-                      }}
-                    >
-                      Sign In
-                    </button>
-                  </div>
-                </Form>
-              </Formik>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </section>
+      <ModelForget
+        showModal={showModal}
+        closeModal={() => setShowModal(false)}
+      />
       <div
         style={{
           position: "absolute",
@@ -139,7 +230,7 @@ const LoginForm = () => {
           zIndex: "9999",
         }}
       >
-      {result && <Snackbar result={result} onClose={handleCloseSnackbar} />}
+        {result && <Snackbar result={result} onClose={handleCloseSnackbar} />}
       </div>
     </div>
   );
